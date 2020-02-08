@@ -8,6 +8,16 @@ import os
 import time
 import getpass
 
+def setup(user):
+	if not os.path.exists("/Users/" + user + "/GitHub/FileMovementPython/TestFolderDocuments"):
+		os.mkdir("/Users/" + user + "/GitHub/FileMovementPython/TestFolderDocuments")
+	if not os.path.exists("/Users/" + user + "/GitHub/FileMovementPython/TestFolderDocuments"):
+		os.mkdir("/Users/" + user + "/GitHub/FileMovementPython/TestFolderDocuments")
+	if not os.path.exists("/Users/" + user + "/GitHub/FileMovementPython/TestFolderMusic"):
+		os.mkdir("/Users/" + user + "/GitHub/FileMovementPython/TestFolderMusic")
+	if not os.path.exists("/Users/" + user + "/GitHub/FileMovementPython/TestFolderPrograms"):
+		os.mkdir("/Users/" + user + "/GitHub/FileMovementPython/TestFolderPrograms")
+
 class MyHandler(FileSystemEventHandler):
 	def on_created(self, event): #need to add an if statement to track what file extensions go where
 		for filename in os.listdir(folder_to_track):
@@ -31,8 +41,9 @@ user = getpass.getuser()
 folder_to_track = "/Users/" + user + "/GitHub/FileMovementPython/TestFolder"
 
 folder_destination_documents = "/Users/" + user + "/GitHub/FileMovementPython/TestFolderDocuments"
-folder_destination_music = "/Users/" + user + "GitHub/FileMovementPython/TestFolderMusic"
+folder_destination_music = "/Users/" + user + "/GitHub/FileMovementPython/TestFolderMusic"
 folder_destination_photos = "/Users/" + user + "/GitHub/FileMovementPython/TestFolderPhotos"
+folder_destination_photos = "/Users/" + user + "/GitHub/FileMovementPython/TestFolderPrograms"
 
 eventHandler = MyHandler()
 observering = Observer()
