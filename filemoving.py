@@ -17,16 +17,18 @@ def setup(user):
 		os.mkdir("/Users/" + user + "/Downloads/Music")
 	if not os.path.exists("/Users/" + user + "/Downloads/Programs"):
 		os.mkdir("/Users/" + user + "/Downloads/Programs")
+	if not os.path.exists("/Users/" + user + "/Downloads/Zip"):
+		os.mkdir("/Users/" + user + "/Downloads/Zip")
 
 class MyHandler(FileSystemEventHandler):
 	def on_created(self, event): #need to add an if statement to track what file extensions go where
 		for filename in os.listdir(folder_to_track):
 			extension = os.path.splitext(filename)[-1].lower()
-			if extension in {'.png', '.jpg', '.jpeg', '.jfif'}:
+			if extension in {'.png', '.jpg', '.jpeg'}:
 				src = folder_to_track + "/" + filename
 				newDestination = folder_destination_photos + "/" + filename
 				os.rename(src, newDestination)
-			elif extension in {'.doc', '.xls', '.pdf', 'txt', '.docx', '.xlsx'}:
+			elif extension in {'.doc', '.xls', '.pdf', 'txt', '.docx'}:
 				src = folder_to_track + "/" + filename
 				newDestination = folder_destination_documents + "/" + filename
 				os.rename(src, newDestination)
@@ -38,16 +40,19 @@ class MyHandler(FileSystemEventHandler):
 				src = folder_to_track + "/" + filename
 				newDestination = folder_destination_programs + "/" + filename
 				os.rename(src, newDestination)
-
+			elif extension in {".zip"}:
+				src = folder_to_track + "/" + filename
+				newDestination = folder_destination_Zip + "/" + filename
+				os.rename(src, newDestination)
 
 user = getpass.getuser()
 
-folder_to_track = "/Users/" + user + "/Downloads"
-
+folder_to_track = "/Users/" + user + "/GitHub/FileMovementPython/TestFolder"
 folder_destination_documents = "/Users/" + user + "/Downloads/Documents"
 folder_destination_music = "/Users/" + user + "/Downloads/Music"
 folder_destination_photos = "/Users/" + user + "/Downloads/Photos"
 folder_destination_programs = "/Users/" + user + "/Downloads/Programs"
+folder_destination_Zip = "/Users/" + user + "/Downloads/zip"
 
 setup(user)
 
@@ -55,7 +60,6 @@ eventHandler = MyHandler()
 observering = Observer()
 observering.schedule(eventHandler, folder_to_track, recursive=True)
 observering.start()
-
 try:
 	while True:
 		time.sleep(10)
