@@ -56,8 +56,8 @@ def move_files():
 		if extension in {'.png', '.jpg', '.jpeg'}:
 			newDestination = PHOTOS + "/" + filename
 		#documents
-		elif extension in {'.doc', '.xls', '.pdf', 'txt', '.docx', '.csv'}:
-			newDestination = DOCUMETNS + "/" + filename
+		elif extension in {'.doc', '.xls', '.xlsx', '.pdf', 'txt', '.docx', '.csv'}:
+			newDestination = DOCUMENTS + "/" + filename
 		#music
 		elif extension in {'.mp3', '.wav'}:
 			newDestination = MUSIC + "/" + filename
@@ -74,7 +74,7 @@ class MyHandler(FileSystemEventHandler):
 	def on_created(self, event):
 		download_wait()
 		move_files()
-		
+
 setup()
 
 eventHandler = MyHandler()
