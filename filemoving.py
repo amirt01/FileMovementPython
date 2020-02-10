@@ -1,68 +1,90 @@
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
+from os.path import exists, splitext
+from os import mkdir, listdir, rename
+from time import sleep
+from getpass import getuser
 
-#need to install these packages pip install watchdog
+USER = getuser()
 
-import json
-import os
-import time
-import getpass
+TRACK = "/Users/" + USER + "/Downloads"
+DOCUMENTS = "/Users/" + USER + "/Downloads/Documents"
+MUSIC = "/Users/" + USER + "/Downloads/Music"
+PHOTOS = "/Users/" + USER + "/Downloads/Photos"
+PROGRAMS = "/Users/" + USER + "/Downloads/Programs"
+ZIPS = "/Users/" + USER + "/Downloads/zip"
 
-def setup(user):
-	if not os.path.exists("/Users/" + user + "/Downloads/Photos"):
-		os.mkdir("/Users/" + user + "/Downloads/Photos")
-	if not os.path.exists("/Users/" + user + "/Downloads/Documents"):
-		os.mkdir("/Users/" + user + "/Downloads/Documents")
-	if not os.path.exists("/Users/" + user + "/Downloads/Music"):
-		os.mkdir("/Users/" + user + "/Downloads/Music")
-	if not os.path.exists("/Users/" + user + "/Downloads/Programs"):
-		os.mkdir("/Users/" + user + "/Downloads/Programs")
-	if not os.path.exists("/Users/" + user + "/Downloads/Zip"):
-		os.mkdir("/Users/" + user + "/Downloads/Zip")
+def setup():
+	#photos
+	if not exists(PHOTOS):
+		mkdir(PHOTOS)
+	#documents
+	if not exists(DOCUMENTS):
+		mkdir(DOCUMENTS)
+	#music
+	if not exists(MUSIC):
+		mkdir(MUSIC)
+	#programs
+	if not exists(PROGRAMS):
+		mkdir(PROGRAMS)
+	#zip
+	if not exists(ZIPS):
+		mkdir(ZIPS)
+
+	move_files()
+
+def download_wait():
+    timeout = 30
+    seconds = 0
+    waiting = True
+
+    while waiting and seconds < timeout:
+        sleep(1)
+        waiting = False
+
+        for filename in listdir(TRACK):
+            if filename.endswith('.crdownload'):
+                wait = True
+        seconds += 1
+
+def move_files():
+	for filename in listdir(TRACK):
+		extension = splitext(filename)[-1].lower()
+		newDestination = src = TRACK + "/" + filename
+
+		#pictures
+		if extension in {'.png', '.jpg', '.jpeg'}:
+			newDestination = PHOTOS + "/" + filename
+		#documents
+		elif extension in {'.doc', '.xls', '.pdf', 'txt', '.docx', '.csv'}:
+			newDestination = DOCUMETNS + "/" + filename
+		#music
+		elif extension in {'.mp3', '.wav'}:
+			newDestination = MUSIC + "/" + filename
+		#programs
+		elif extension in {".exe", '.msi'}:
+			newDestination = PROGRAMS + "/" + filename
+		#zips
+		elif extension in {".zip"}:
+			newDestination = ZIPS + "/" + filename
+
+		rename(src, newDestination)
 
 class MyHandler(FileSystemEventHandler):
-	def on_created(self, event): #need to add an if statement to track what file extensions go where
-		for filename in os.listdir(folder_to_track):
-			extension = os.path.splitext(filename)[-1].lower()
-			if extension in {'.png', '.jpg', '.jpeg'}:
-				src = folder_to_track + "/" + filename
-				newDestination = folder_destination_photos + "/" + filename
-				os.rename(src, newDestination)
-			elif extension in {'.doc', '.xls', '.pdf', 'txt', '.docx'}:
-				src = folder_to_track + "/" + filename
-				newDestination = folder_destination_documents + "/" + filename
-				os.rename(src, newDestination)
-			elif extension in {'.mp3', '.wav'}:
-				src = folder_to_track + "/" + filename
-				newDestination = folder_destination_music + "/" + filename
-				os.rename(src, newDestination)
-			elif extension in {".exe", '.msi'}:
-				src = folder_to_track + "/" + filename
-				newDestination = folder_destination_programs + "/" + filename
-				os.rename(src, newDestination)
-			elif extension in {".zip"}:
-				src = folder_to_track + "/" + filename
-				newDestination = folder_destination_Zip + "/" + filename
-				os.rename(src, newDestination)
-
-user = getpass.getuser()
-
-folder_to_track = "/Users/" + user + "/GitHub/FileMovementPython/TestFolder"
-folder_destination_documents = "/Users/" + user + "/Downloads/Documents"
-folder_destination_music = "/Users/" + user + "/Downloads/Music"
-folder_destination_photos = "/Users/" + user + "/Downloads/Photos"
-folder_destination_programs = "/Users/" + user + "/Downloads/Programs"
-folder_destination_Zip = "/Users/" + user + "/Downloads/zip"
-
-setup(user)
+	def on_created(self, event):
+		download_wait()
+		move_files()
+		
+setup()
 
 eventHandler = MyHandler()
-observering = Observer()
-observering.schedule(eventHandler, folder_to_track, recursive=True)
-observering.start()
+observer = Observer()
+observer.schedule(eventHandler, TRACK, recursive=True)
+observer.start()
+
 try:
-	while True:
-		time.sleep(10)
+    while True:
+        sleep(10)
 except KeyboardInterrupt:
-	observering.stop()
-observering.join()
+    observer.stop()
+observer.join()
